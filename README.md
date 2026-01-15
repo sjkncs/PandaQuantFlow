@@ -334,7 +334,7 @@ factor_manager.register("my_factor", MyFactor)
 
 - 项目主页: https://github.com/your-username/PandaQuantFlow
 - 问题反馈: https://github.com/your-username/PandaQuantFlow/issues
-- 邮箱: your-email@example.com
+- 邮箱:zhiwaisong@gmail.com
 
 ---
 
