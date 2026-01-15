@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda AI 因子库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 260px;
+            background: #1a1a1a;
+            border-right: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-section {
+            padding: 20px 12px;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 12px;
+            padding: 0 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        .nav-item.active .nav-icon {
+            opacity: 1;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            height: 60px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #2a2a2a;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .model-selector select {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* 聊天区域 */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .message {
+            margin-bottom: 24px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .message.user .avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .sender-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .message-content {
+            margin-left: 44px;
+            line-height: 1.6;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        .message-content pre {
+            background: #2a2a2a;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 12px 0;
+            border: 1px solid #3a3a3a;
+        }
+
+        .message-content code {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        /* 输入区域 */
+        .input-area {
+            background: #1a1a1a;
+            border-top: 1px solid #2a2a2a;
+            padding: 20px 24px;
+        }
+
+        .input-wrapper {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-tools {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tool-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid #3a3a3a;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            background: #3a3a3a;
+            border-color: #4a4a4a;
+        }
+
+        .tool-btn img {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        .tool-btn:hover img {
+            opacity: 1;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            min-height: 24px;
+            max-height: 200px;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .input-field::placeholder {
+            color: #666;
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* 因子文档区域 */
+        .docs-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .doc-section {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .doc-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .doc-subtitle {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 12px;
+            color: #e0e0e0;
+        }
+
+        .function-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .function-item {
+            background: #2a2a2a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #3a3a3a;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .function-item:hover {
+            border-color: #667eea;
+            background: #2d2d2d;
+        }
+
+        .function-name {
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .function-desc {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .search-box {
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: #667eea;
+        }
+
+        /* 历史记录 */
+        .history-item {
+            padding: 12px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: #3a3a3a;
+        }
+
+        .history-title {
+            font-size: 13px;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* 加载动画 */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: #666;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { 
+                transform: scale(0);
+            } 
+            40% { 
+                transform: scale(1.0);
+            }
+        }
+
+        /* 错误提示 */
+        .error-banner {
+            background: #2a1a1a;
+            border: 1px solid #4a2a2a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: #ff6b6b;
+            font-size: 13px;
+            display: none;
+        }
+
+        .error-banner.show {
+            display: block;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar-header,
+            .nav-title,
+            .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🐼</div>
+                    <span>Panda AI</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">功能</div>
+                <div class="nav-item active" onclick="switchView('chat')">
+                    <img src="../../../../../../icon/chat.png" class="nav-icon" alt="对话">
+                    <span>AI 对话</span>
+                </div>
+                <div class="nav-item" onclick="switchView('factors')">
+                    <img src="../../../../../../icon/document.png" class="nav-icon" alt="因子">
+                    <span>因子文档</span>
+                </div>
+                <div class="nav-item" onclick="switchView('imagine')">
+                    <img src="../../../../../../icon/IconImagineAi.png" class="nav-icon" alt="生成">
+                    <span>代码生成</span>
+                </div>
+                <div class="nav-item" onclick="switchView('projects')">
+                    <img src="../../../../../../icon/project.png" class="nav-icon" alt="项目">
+                    <span>我的项目</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">历史</div>
+                <div id="history-list">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 顶部栏 -->
+            <div class="top-bar">
+                <div class="model-selector">
+                    <span style="color: #999; font-size: 13px;">模型:</span>
+                    <select id="model-select" onchange="switchModel()">
+                        <option value="deepseek">DeepSeek V3</option>
+                        <option value="qwen">Qwen 2.5 72B</option>
+                        <option value="qwen_coder">Qwen Coder 32B</option>
+                        <option value="glm">GLM-4 9B</option>
+                    </select>
+                </div>
+
+                <div class="status-indicators">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="status-dot" id="api-dot"></div>
+                        <span class="status-text" id="api-status">检查中...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 对话视图 -->
+            <div id="chat-view" class="view active">
+                <div class="chat-area">
+                    <div id="error-banner" class="error-banner"></div>
+                    
+                    <div class="messages-container" id="messages">
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="avatar">🤖</div>
+                                <span class="sender-name">Panda AI</span>
+                                <span class="timestamp" id="init-time"></span>
+                            </div>
+                            <div class="message-content">
+                                <p>您好！我是 Panda AI 因子助手。</p>
+                                <p style="margin-top: 12px;">我可以帮您：</p>
+                                <ul style="margin-top: 8px; padding-left: 20px;">
+                                    <li>生成量化因子代码</li>
+                                    <li>分析因子表现</li>
+                                    <li>优化因子参数</li>
+                                    <li>解答量化相关问题</li>
+                                </ul>
+                                <p style="margin-top: 12px;">请告诉我您需要什么帮助？</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-area">
+                        <div class="input-wrapper">
+                            <div class="input-tools">
+                                <label class="tool-btn" title="上传文件">
+                                    <img src="../../../../../../icon/attachment.png" alt="附件">
+                                    <input type="file" multiple style="display: none;" onchange="handleFileUpload(event)">
+                                </label>
+                                <label class="tool-btn" title="上传图片">
+                                    <img src="../../../../../../icon/IconImagineAi.png" alt="图片">
+                                    <input type="file" accept="image/*" multiple style="display: none;" onchange="handleFileUpload(event)">
+                                </label>
+                                <label class="tool-btn" title="语音输入">
+                                    <img src="../../../../../../icon/voice.png" alt="语音">
+                                    <input type="file" accept="audio/*" style="display: none;" onchange="handleFileUpload(event)">
+                                </label>
+                                <button class="tool-btn" title="搜索历史" onclick="toggleSearch()">
+                                    <img src="../../../../../../icon/search.png" alt="搜索">
+                                </button>
+                                <button class="tool-btn" title="查看历史" onclick="toggleHistory()">
+                                    <img src="../../../../../../icon/time-history.png" alt="历史">
+                                </button>
+                            </div>
+                            <div class="input-row">
+                                <textarea 
+                                    id="message-input" 
+                                    class="input-field" 
+                                    placeholder="输入您的问题... (Shift+Enter 换行)"
+                                    rows="1"
+                                ></textarea>
+                                <button class="send-btn" onclick="sendMessage()" id="send-btn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 因子文档视图 -->
+            <div id="factors-view" class="view">
+                <div class="docs-area">
+                    <input type="text" class="search-box" placeholder="搜索因子函数..." id="factor-search" oninput="searchFactors()">
+                    
+                    <div class="doc-section">
+                        <div class="doc-title">📊 官方因子函数库</div>
+                        <p style="color: #999; margin-bottom: 20px;">Panda AI 提供了丰富的因子计算函数，支持多股票并行计算</p>
+                        
+                        <div class="doc-subtitle">基础计算函数</div>
+                        <div class="function-list" id="basic-functions">
+                            <!-- 动态加载 -->
+                        </div>
+
+                        <div class="doc-subtitle">时间序列函数</div>
+                        <div class="function-list" id="ts-functions">
+                            <!-- 动态加载 -->
+                        </div>
+
+                        <div class="doc-subtitle">技术指标函数</div>
+                        <div class="function-list" id="indicator-functions">
+                            <!-- 动态加载 -->
+                        </div>
+
+                        <div class="doc-subtitle">核心工具函数</div>
+                        <div class="function-list" id="util-functions">
+                            <!-- 动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 代码生成视图 -->
+            <div id="imagine-view" class="view">
+                <div class="chat-area">
+                    <div class="messages-container" id="imagine-messages">
+                        <div class="message">
+                            <div class="message-header">
+                                <div class="avatar">⚡</div>
+                                <span class="sender-name">代码生成器</span>
+                            </div>
+                            <div class="message-content">
+                                <p>描述您需要的因子，我会为您生成完整的代码。</p>
+                                <p style="margin-top: 12px;">示例：</p>
+                                <ul style="margin-top: 8px; padding-left: 20px;">
+                                    <li>创建一个20日动量因子</li>
+                                    <li>结合MACD和RSI的复合因子</li>
+                                    <li>基于成交量的价格强度因子</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <div class="input-wrapper">
+                            <div class="input-row">
+                                <textarea 
+                                    id="imagine-input" 
+                                    class="input-field" 
+                                    placeholder="描述您需要的因子..."
+                                    rows="1"
+                                ></textarea>
+                                <button class="send-btn" onclick="generateCode()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目视图 -->
+            <div id="projects-view" class="view">
+                <div class="docs-area">
+                    <div class="doc-section">
+                        <div class="doc-title">📁 我的项目</div>
+                        <p style="color: #999;">您的因子项目将显示在这里</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentModel = 'deepseek';
+        let chatHistory = [];
+        let uploadedFiles = [];
+        const API_BASE = 'http://127.0.0.1:8111';
+
+        // 因子函数数据
+        const factorFunctions = {
+            basic: [
+                { name: 'RANK(series)', desc: '横截面排名，归一化到[-0.5, 0.5]范围' },
+                { name: 'RETURNS(close, period=1)', desc: '计算收益率' },
+                { name: 'STDDEV(series, window=20)', desc: '计算滚动标准差' },
+                { name: 'CORRELATION(series1, series2, window=20)', desc: '计算滚动相关系数' },
+                { name: 'IF(condition, true_value, false_value)', desc: '条件选择函数' },
+                { name: 'MIN(series1, series2)', desc: '取两个序列对应位置的最小值' },
+                { name: 'MAX(series1, series2)', desc: '取两个序列对应位置的最大值' },
+                { name: 'ABS(series)', desc: '计算绝对值' },
+                { name: 'LOG(series)', desc: '计算自然对数' },
+                { name: 'POWER(series, power)', desc: '计算幂次方' },
+                { name: 'SIGN(series)', desc: '计算符号值（1, 0, -1）' },
+                { name: 'SIGNEDPOWER(series, power)', desc: '计算带符号的幂次方' },
+                { name: 'COVARIANCE(series1, series2, window=20)', desc: '计算滚动协方差' }
+            ],
+            timeseries: [
+                { name: 'DELAY(series, period=1)', desc: '序列延迟，返回N周期前的值' },
+                { name: 'SUM(series, window=20)', desc: '计算移动求和' },
+                { name: 'TS_ARGMAX(series, window)', desc: '返回窗口内最大值的位置' },
+                { name: 'TS_ARGMIN(series, window)', desc: '返回窗口内最小值的位置' },
+                { name: 'TS_MEAN(series, window=20)', desc: '计算移动平均' },
+                { name: 'TS_MIN(series, window=20)', desc: '计算移动最小值' },
+                { name: 'TS_MAX(series, window=20)', desc: '计算移动最大值' },
+                { name: 'TS_RANK(series, window=20)', desc: '计算时间序列排名' },
+                { name: 'DECAY_LINEAR(series, window=20)', desc: '线性衰减加权' },
+                { name: 'MA(series, window)', desc: '简单移动平均' },
+                { name: 'EMA(series, window)', desc: '指数移动平均' },
+                { name: 'SMA(series, window, M=1)', desc: '平滑移动平均' },
+                { name: 'WMA(series, window)', desc: '加权移动平均' }
+            ],
+            indicators: [
+                { name: 'MACD(close, SHORT=12, LONG=26, M=9)', desc: '计算MACD指标，返回快线、慢线和MACD值' },
+                { name: 'KDJ(close, high, low, N=9, M1=3, M2=3)', desc: '计算KDJ指标，返回K、D、J值' },
+                { name: 'RSI(close, N=24)', desc: '计算相对强弱指标' },
+                { name: 'BOLL(close, N=20, P=2)', desc: '计算布林带，返回上中下轨' },
+                { name: 'CCI(close, high, low, N=14)', desc: '计算顺势指标' },
+                { name: 'ATR(close, high, low, N=20)', desc: '计算真实波动幅度均值' },
+                { name: 'DMI(close, high, low, M1=14, M2=6)', desc: '计算动向指标，返回PDI、MDI、ADX、ADXR' },
+                { name: 'BBI(close, M1=3, M2=6, M3=12, M4=20)', desc: '计算多空指标' },
+                { name: 'TRIX(close, M1=12, M2=20)', desc: '计算三重指数平滑平均线' },
+                { name: 'OBV(close, vol)', desc: '计算能量潮指标' },
+                { name: 'MFI(close, high, low, vol, N=14)', desc: '计算资金流量指标' },
+                { name: 'WR(close, high, low, N=10, N1=6)', desc: '计算威廉指标' }
+            ],
+            utils: [
+                { name: 'REF(S, N=1)', desc: '对序列整体下移动N' },
+                { name: 'DIFF(S, N=1)', desc: '计算前后差值' },
+                { name: 'HHVBARS(S, N)', desc: '求N周期内最高值到当前的周期数' },
+                { name: 'LLVBARS(S, N)', desc: '求N周期内最低值到当前的周期数' },
+                { name: 'SLOPE(S, N)', desc: '计算线性回归斜率' },
+                { name: 'COUNT(S, N)', desc: '统计N周期内满足条件的周期数' },
+                { name: 'EVERY(S, N)', desc: '判断N周期内是否都满足条件' },
+                { name: 'EXIST(S, N)', desc: '判断N周期内是否存在满足条件的周期' },
+                { name: 'CROSS(S1, S2)', desc: '判断向上金叉穿越' },
+                { name: 'VALUEWHEN(S, X)', desc: '当条件成立时取值' }
+            ]
+        };
+
+        // 初始化
+        window.onload = function() {
+            initTimestamp();
+            loadFactorFunctions();
+            checkAPIStatus();
+            loadHistory();
+            setupAutoResize();
+        };
+
+        // 初始化时间戳
+        function initTimestamp() {
+            const now = new Date();
+            document.getElementById('init-time').textContent = now.toLocaleTimeString('zh-CN');
+        }
+
+        // 加载因子函数
+        function loadFactorFunctions() {
+            loadFunctionList('basic-functions', factorFunctions.basic);
+            loadFunctionList('ts-functions', factorFunctions.timeseries);
+            loadFunctionList('indicator-functions', factorFunctions.indicators);
+            loadFunctionList('util-functions', factorFunctions.utils);
+        }
+
+        function loadFunctionList(containerId, functions) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = functions.map(func => `
+                <div class="function-item" onclick="insertFunction('${func.name}')">
+                    <div class="function-name">${func.name}</div>
+                    <div class="function-desc">${func.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        // 搜索因子
+        function searchFactors() {
+            const query = document.getElementById('factor-search').value.toLowerCase();
+            const items = document.querySelectorAll('.function-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        // 插入函数到输入框
+        function insertFunction(funcName) {
+            const input = document.getElementById('message-input');
+            input.value = `请帮我使用 ${funcName} 函数创建一个因子`;
+            input.focus();
+            switchView('chat');
+        }
+
+        // 检查API状态
+        async function checkAPIStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/api/status`);
+                if (response.ok) {
+                    document.getElementById('api-status').textContent = 'API 已连接';
+                    document.getElementById('api-dot').style.background = '#4ade80';
+                } else {
+                    throw new Error('API 响应错误');
+                }
+            } catch (error) {
+                document.getElementById('api-status').textContent = 'API 未连接';
+                document.getElementById('api-dot').style.background = '#ff6b6b';
+                showError('无法连接到后端服务，请确保服务正在运行');
+            }
+        }
+
+        // 切换视图
+        function switchView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`${viewName}-view`).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // 切换模型
+        function switchModel() {
+            currentModel = document.getElementById('model-select').value;
+        }
+
+        // 发送消息
+        async function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // 添加用户消息
+            addMessage('user', message);
+            input.value = '';
+            chatHistory.push({ role: 'user', content: message });
+            
+            // 显示加载
+            const loadingId = addMessage('assistant', '<div class="loading-dots"><span></span><span></span><span></span></div>');
+            
+            try {
+                const response = await fetch(`${API_BASE}/llm/chat/simple`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        model: currentModel,
+                        history: chatHistory.slice(-10)
+                    })
+                });
+                
+                document.getElementById(loadingId).remove();
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const reply = data.response || data.message || '收到回复但内容为空';
+                    addMessage('assistant', reply);
+                    chatHistory.push({ role: 'assistant', content: reply });
+                    saveHistory();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                addMessage('assistant', `抱歉，发送失败: ${error.message}`);
+                showError('消息发送失败，请检查网络连接和后端服务');
+            }
+        }
+
+        // 生成代码
+        async function generateCode() {
+            const input = document.getElementById('imagine-input');
+            const description = input.value.trim();
+            
+            if (!description) return;
+            
+            const container = document.getElementById('imagine-messages');
+            
+            // 添加用户消息
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `
+                <div class="message-header">
+                    <div class="avatar">👤</div>
+                    <span class="sender-name">您</span>
+                    <span class="timestamp">${new Date().toLocaleTimeString('zh-CN')}</span>
+                </div>
+                <div class="message-content">${description}</div>
+            `;
+            container.appendChild(userMsg);
+            input.value = '';
+            
+            // 显示加载
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'message';
+            loadingMsg.id = 'loading-' + Date.now();
+            loadingMsg.innerHTML = `
+                <div class="message-header">
+                    <div class="avatar">⚡</div>
+                    <span class="sender-name">代码生成器</span>
+                </div>
+                <div class="message-content">
+                    <div class="loading-dots"><span></span><span></span><span></span></div>
+                </div>
+            `;
+            container.appendChild(loadingMsg);
+            container.scrollTop = container.scrollHeight;
+            
+            try {
+                const response = await fetch(`${API_BASE}/llm/chat/simple`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `请根据以下描述生成Python因子代码：${description}`,
+                        model: 'deepseek'
+                    })
+                });
+                
+                loadingMsg.remove();
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const code = data.response || data.message;
+                    
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'message';
+                    aiMsg.innerHTML = `
+                        <div class="message-header">
+                            <div class="avatar">⚡</div>
+                            <span class="sender-name">代码生成器</span>
+                            <span class="timestamp">${new Date().toLocaleTimeString('zh-CN')}</span>
+                        </div>
+                        <div class="message-content">
+                            <pre><code>${escapeHtml(code)}</code></pre>
+                        </div>
+                    `;
+                    container.appendChild(aiMsg);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                loadingMsg.remove();
+                showError('代码生成失败: ' + error.message);
+            }
+            
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 添加消息
+        function addMessage(role, content) {
+            const container = document.getElementById('messages');
+            const msgId = 'msg-' + Date.now();
+            
+            const msg = document.createElement('div');
+            msg.className = `message ${role}`;
+            msg.id = msgId;
+            
+            const avatar = role === 'user' ? '👤' : '🤖';
+            const name = role === 'user' ? '您' : 'Panda AI';
+            
+            msg.innerHTML = `
+                <div class="message-header">
+                    <div class="avatar">${avatar}</div>
+                    <span class="sender-name">${name}</span>
+                    <span class="timestamp">${new Date().toLocaleTimeString('zh-CN')}</span>
+                </div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+            
+            return msgId;
+        }
+
+        // 文件上传
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            uploadedFiles.push(...files);
+            
+            const fileNames = Array.from(files).map(f => f.name).join(', ');
+            showError(`已添加文件: ${fileNames}`, 'success');
+        }
+
+        // 显示错误
+        function showError(message, type = 'error') {
+            const banner = document.getElementById('error-banner');
+            banner.textContent = message;
+            banner.className = 'error-banner show';
+            banner.style.background = type === 'success' ? '#1a2a1a' : '#2a1a1a';
+            banner.style.borderColor = type === 'success' ? '#2a4a2a' : '#4a2a2a';
+            banner.style.color = type === 'success' ? '#4ade80' : '#ff6b6b';
+            
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 3000);
+        }
+
+        // 保存历史
+        function saveHistory() {
+            const history = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                preview: chatHistory[0]?.content?.substring(0, 30) || '新对话',
+                messages: chatHistory
+            };
+            
+            let allHistory = JSON.parse(localStorage.getItem('chat_history') || '[]');
+            allHistory.unshift(history);
+            allHistory = allHistory.slice(0, 20);
+            localStorage.setItem('chat_history', JSON.stringify(allHistory));
+            
+            loadHistory();
+        }
+
+        // 加载历史
+        function loadHistory() {
+            const allHistory = JSON.parse(localStorage.getItem('chat_history') || '[]');
+            const container = document.getElementById('history-list');
+            
+            container.innerHTML = allHistory.slice(0, 10).map(h => `
+                <div class="history-item" onclick="loadConversation(${h.id})">
+                    <div class="history-title">${h.preview}</div>
+                    <div class="history-date">${new Date(h.timestamp).toLocaleDateString('zh-CN')}</div>
+                </div>
+            `).join('');
+        }
+
+        // 加载对话
+        function loadConversation(id) {
+            const allHistory = JSON.parse(localStorage.getItem('chat_history') || '[]');
+            const conversation = allHistory.find(h => h.id === id);
+            
+            if (conversation) {
+                chatHistory = conversation.messages;
+                const container = document.getElementById('messages');
+                container.innerHTML = '';
+                
+                chatHistory.forEach(msg => {
+                    addMessage(msg.role, msg.content);
+                });
+                
+                switchView('chat');
+            }
+        }
+
+        // 自动调整输入框高度
+        function setupAutoResize() {
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (this.id === 'message-input') {
+                            sendMessage();
+                        } else if (this.id === 'imagine-input') {
+                            generateCode();
+                        }
+                    }
+                });
+            });
+        }
+
+        // 工具函数
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function toggleSearch() {
+            switchView('factors');
+            document.getElementById('factor-search').focus();
+        }
+
+        function toggleHistory() {
+            // 切换历史面板显示
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.style.width = sidebar.style.width === '400px' ? '260px' : '400px';
+        }
+
+        // 定期检查API状态
+        setInterval(checkAPIStatus, 30000);
+    </script>
+</body>
+</html>

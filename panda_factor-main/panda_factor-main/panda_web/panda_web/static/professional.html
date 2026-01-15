@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda AI - 专业金融分析平台</title>
+    <link rel="stylesheet" href="professional.css">
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">🐼</div>
+                <span>Panda AI 金融分析</span>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('chat')">对话</div>
+            <div class="nav-tab" onclick="switchTab('analysis')">分析</div>
+            <div class="nav-tab" onclick="switchTab('tools')">工具</div>
+        </div>
+        
+        <div style="margin: 16px; padding-top: 16px; border-top: 1px solid #e5e5e5;">
+            <button onclick="openQuantFlow()" style="
+                width: 100%;
+                padding: 12px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                transition: all 0.2s;
+            ">
+                🚀 QuantFlow 工作流
+            </button>
+        </div>
+
+        <div class="function-list" id="functionList"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <div class="model-selector">
+                <div class="model-button" onclick="toggleModelDropdown()">
+                    <span id="currentModelName">DeepSeek V3</span>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="model-dropdown" id="modelDropdown">
+                    <div class="model-option selected" onclick="selectModel('deepseek')">
+                        <div class="model-name">DeepSeek V3</div>
+                        <div class="model-desc">代码生成专家</div>
+                    </div>
+                    <div class="model-option" onclick="selectModel('qwen')">
+                        <div class="model-name">Qwen 2.5 72B</div>
+                        <div class="model-desc">中文理解专家</div>
+                    </div>
+                    <div class="model-option" onclick="selectModel('qwen_coder')">
+                        <div class="model-name">Qwen Coder 32B</div>
+                        <div class="model-desc">专业编程模型</div>
+                    </div>
+                    <div class="model-option" onclick="selectModel('glm')">
+                        <div class="model-name">GLM-4 9B</div>
+                        <div class="model-desc">通用对话模型</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="flex: 1;"></div>
+
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <button class="analysis-btn" onclick="toggleAnalysisPanel()">
+                    📊 市场数据
+                </button>
+                <span style="font-size: 13px; color: #999;" id="apiStatus">检查中...</span>
+            </div>
+        </div>
+
+        <!-- 工作区域 -->
+        <div class="workspace">
+            <div class="chat-area">
+                <div class="messages-container" id="messagesContainer">
+                    <!-- 初始欢迎消息 -->
+                    <div class="message assistant">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-text">
+                                <p>您好！我是 Panda AI 金融分析助手。</p>
+                                <p style="margin-top: 12px;">我可以帮您：</p>
+                                <ul style="margin: 8px 0 0 20px;">
+                                    <li>生成量化因子代码</li>
+                                    <li>进行股票技术分析</li>
+                                    <li>创建数据可视化图表</li>
+                                    <li>执行策略回测</li>
+                                    <li>分析市场数据</li>
+                                </ul>
+                                <p style="margin-top: 12px;">请问有什么可以帮助您的？</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <div class="input-toolbar">
+                            <div class="tool-btn" title="附件">
+                                <img src="/icon/attachment.png" alt="附件">
+                                <input type="file" multiple onchange="handleFileUpload(event)" aria-label="上传附件" title="上传附件">
+                            </div>
+                            <div class="tool-btn" title="图片">
+                                <img src="/icon/IconImagineAi.png" alt="图片">
+                                <input type="file" accept="image/*" multiple onchange="handleFileUpload(event)" aria-label="上传图片" title="上传图片">
+                            </div>
+                            <div class="tool-btn" title="语音">
+                                <img src="/icon/voice.png" alt="语音">
+                                <input type="file" accept="audio/*" onchange="handleFileUpload(event)" aria-label="上传语音" title="上传语音">
+                            </div>
+                            <div class="tool-separator"></div>
+                            <div class="tool-btn" title="创建图表" onclick="insertChartCommand()">
+                                📊
+                            </div>
+                            <div class="tool-btn" title="技术分析" onclick="insertAnalysisCommand()">
+                                📈
+                            </div>
+                            <div class="tool-btn" title="因子回测" onclick="insertBacktestCommand()">
+                                🔄
+                            </div>
+                        </div>
+                        <textarea 
+                            id="messageInput"
+                            class="message-input" 
+                            placeholder="输入您的问题..."
+                            rows="1"
+                        ></textarea>
+                        <div class="input-footer">
+                            <div class="input-hints">
+                                <span>Enter 发送</span>
+                                <span>Shift + Enter 换行</span>
+                                <span>@ 提及功能</span>
+                            </div>
+                            <div class="send-group">
+                                <button class="analysis-btn" onclick="runAnalysis()">运行分析</button>
+                                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                                    发送
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                        <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据分析面板 -->
+    <div class="analysis-panel" id="analysisPanel">
+        <div class="panel-header">
+            <div class="panel-title">市场数据</div>
+            <div class="panel-close" onclick="toggleAnalysisPanel()">✕</div>
+        </div>
+        <div class="panel-content">
+            <div class="analysis-section">
+                <div class="section-title">主要指数</div>
+                <div id="indicesList"></div>
+            </div>
+            <div class="analysis-section">
+                <div class="section-title">热门板块</div>
+                <div id="sectorsList"></div>
+            </div>
+            <div class="analysis-section">
+                <div class="section-title">热门股票</div>
+                <div id="stocksList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="professional.js"></script>
+</body>
+</html>

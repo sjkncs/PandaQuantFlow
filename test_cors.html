@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试 CORS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 PandaAI CORS 测试</h1>
+    
+    <div class="test-section">
+        <h2>测试 1: LLM 状态查询</h2>
+        <button onclick="testLLMStatus()">测试 GET /llm/status</button>
+        <div id="result1"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试 2: 获取模型列表</h2>
+        <button onclick="testGetModels()">测试 GET /llm/models</button>
+        <div id="result2"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试 3: 简化聊天接口</h2>
+        <button onclick="testSimpleChat()">测试 POST /llm/chat/simple</button>
+        <div id="result3"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试 4: QuantFlow 健康检查</h2>
+        <button onclick="testQuantFlowHealth()">测试 GET /api/health</button>
+        <div id="result4"></div>
+    </div>
+
+    <script>
+        async function testLLMStatus() {
+            const resultDiv = document.getElementById('result1');
+            resultDiv.innerHTML = '<p>⏳ 正在测试...</p>';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8111/llm/status');
+                const data = await response.json();
+                
+                resultDiv.className = 'test-section success';
+                resultDiv.innerHTML = `
+                    <p>✅ 请求成功！</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'test-section error';
+                resultDiv.innerHTML = `
+                    <p>❌ 请求失败</p>
+                    <pre>${error.toString()}</pre>
+                `;
+            }
+        }
+        
+        async function testGetModels() {
+            const resultDiv = document.getElementById('result2');
+            resultDiv.innerHTML = '<p>⏳ 正在测试...</p>';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8111/llm/models');
+                const data = await response.json();
+                
+                resultDiv.className = 'test-section success';
+                resultDiv.innerHTML = `
+                    <p>✅ 请求成功！</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'test-section error';
+                resultDiv.innerHTML = `
+                    <p>❌ 请求失败</p>
+                    <pre>${error.toString()}</pre>
+                `;
+            }
+        }
+        
+        async function testSimpleChat() {
+            const resultDiv = document.getElementById('result3');
+            resultDiv.innerHTML = '<p>⏳ 正在测试...</p>';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8111/llm/chat/simple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '你好，这是CORS测试',
+                        model: 'deepseek'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.className = 'test-section success';
+                resultDiv.innerHTML = `
+                    <p>✅ 请求成功！</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'test-section error';
+                resultDiv.innerHTML = `
+                    <p>❌ 请求失败</p>
+                    <pre>${error.toString()}</pre>
+                `;
+            }
+        }
+        
+        async function testQuantFlowHealth() {
+            const resultDiv = document.getElementById('result4');
+            resultDiv.innerHTML = '<p>⏳ 正在测试...</p>';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/health');
+                const data = await response.json();
+                
+                resultDiv.className = 'test-section success';
+                resultDiv.innerHTML = `
+                    <p>✅ 请求成功！</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'test-section error';
+                resultDiv.innerHTML = `
+                    <p>❌ 请求失败</p>
+                    <pre>${error.toString()}</pre>
+                `;
+            }
+        }
+        
+        // 页面加载时显示当前URL
+        window.onload = function() {
+            console.log('当前页面URL:', window.location.href);
+            console.log('测试页面已加载，可以开始测试CORS');
+        };
+    </script>
+</body>
+</html>
